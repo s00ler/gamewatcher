@@ -14,6 +14,7 @@ class ArgParser:
         self.parser = argparse.ArgumentParser()
         self.parser.add_argument('-cs', help='local or remote')
         self.parser.add_argument('-a', help='Action')
+        self.parser.add_argument('-bt', help='Batch period')
 
     def parse(self):
         """Parsing arguments and creating attribute for each."""

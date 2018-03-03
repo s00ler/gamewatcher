@@ -3,7 +3,7 @@ from datetime import datetime as dt
 from threading import Thread
 from pynput import keyboard as kb
 
-from ..action import _type, input_action_type
+from ..action import Action
 from ..models import KeyboardLog
 
 
@@ -34,7 +34,7 @@ class Keyboard:
         elif key == kb.Key.f12 and self.stopped:
             self.stopped = False
         elif key == kb.Key.f10:
-            input_action_type()
+            Action.input()
         else:
             if not self.stopped:
                 if isinstance(key, kb.KeyCode):
@@ -47,7 +47,6 @@ class Keyboard:
                 self.logger.write(KeyboardLog(
                     key_code=key_code,
                     key_symbol=str(key),
-                    action_type=_type,
                     timestamp=dt.utcnow().timestamp(),
                     key_action='press'
                 ))
@@ -66,13 +65,15 @@ class Keyboard:
                 self.logger.write(KeyboardLog(
                     key_code=key_code,
                     key_symbol=str(key),
-                    action_type=_type,
                     timestamp=dt.utcnow().timestamp(),
                     key_action='release'
                 ))
 
     def listen(self):
         """Start listening."""
-        with kb.Listener(on_press=self.on_press,
-                         on_release=self.on_release) as self.listener:
-            self.listener.join()
+        try:
+            with kb.Listener(on_press=self.on_press,
+                             on_release=self.on_release) as self.listener:
+                self.listener.join()
+        except Exception:
+            return

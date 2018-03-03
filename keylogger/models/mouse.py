@@ -10,7 +10,7 @@ class MouseLog(Base):
     id = Column(Integer, primary_key=True)
     author_name = Column(String, default=name)
     author_mac = Column(BigInteger, default=mac)
-    action_type = Column(String)
+    action_type = Column(String, default=None)
     x = Column(Float)
     y = Column(Float)
     key = Column(String)

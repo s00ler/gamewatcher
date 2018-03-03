@@ -10,7 +10,7 @@ class KeyboardLog(Base):
     id = Column(Integer, primary_key=True)
     author_name = Column(String, default=name)
     author_mac = Column(BigInteger, default=mac)
-    action_type = Column(String)
+    action_type = Column(String, default=None)
     key_action = Column(String)
     key_code = Column(String)
     key_symbol = Column(String)

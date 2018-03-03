@@ -3,7 +3,6 @@ from datetime import datetime as dt
 
 from pynput import mouse
 
-from ..action import _type
 from ..models import MouseLog
 
 # import sys # TODO for mouse reminder
@@ -63,19 +62,20 @@ class Mouse:
         self.scroll.release()
         click_type = str(button).split('.')[-1]
         self.logger.write(MouseLog(x=x, y=y, key=click_type,
-                                   action_type=_type,
                                    timestamp=dt.utcnow().timestamp()))
 
     def _on_scroll(self, x, y, dx, dy):
         """Action on scrolling mouse at the point."""
         if self.scroll.set(x, y):
             self.logger.write(MouseLog(x=x, y=y, key='scroll',
-                                       action_type=_type,
                                        timestamp=dt.utcnow().timestamp()))
 
     def listen(self):
         """Start listening."""
-        with mouse.Listener(on_move=self._on_move,
-                            on_click=self._on_click,
-                            on_scroll=self._on_scroll) as self.listener:
-            self.listener.join()
+        try:
+            with mouse.Listener(on_move=self._on_move,
+                                on_click=self._on_click,
+                                on_scroll=self._on_scroll) as self.listener:
+                self.listener.join()
+        except Exception:
+            return
