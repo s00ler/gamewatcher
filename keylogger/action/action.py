@@ -10,7 +10,7 @@ class Action:
         return cls._type
 
     @classmethod
-    def input(cls, value):
+    def input(cls):
         print('Input action type:')
         cls._type = input()
         print('Action type is set {}'.format(cls._type))
