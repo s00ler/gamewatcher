@@ -4,7 +4,7 @@ from threading import Thread
 from configparser import ConfigParser
 
 from utils import ArgParser
-from keylogger import Keyboard, Mouse, Logger, Action
+from application import Keyboard, Mouse, Logger, Action
 
 
 if __name__ == '__main__':
