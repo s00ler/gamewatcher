@@ -1,0 +1,4 @@
+# it is an example.
+[DATABASE]
+remote = {sql_engine}://{user}:{password}@{host}:{port}
+local = sqlite:///keylogger/logs/keylogger.db
