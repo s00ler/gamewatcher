@@ -72,10 +72,7 @@ class Mouse:
 
     def listen(self):
         """Start listening."""
-        try:
-            with mouse.Listener(on_move=self._on_move,
-                                on_click=self._on_click,
-                                on_scroll=self._on_scroll) as self.listener:
-                self.listener.join()
-        except Exception:
-            return
+        with mouse.Listener(on_move=self._on_move,
+                            on_click=self._on_click,
+                            on_scroll=self._on_scroll) as self.listener:
+            self.listener.join()

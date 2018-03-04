@@ -71,9 +71,6 @@ class Keyboard:
 
     def listen(self):
         """Start listening."""
-        try:
-            with kb.Listener(on_press=self.on_press,
-                             on_release=self.on_release) as self.listener:
-                self.listener.join()
-        except Exception:
-            return
+        with kb.Listener(on_press=self.on_press,
+                         on_release=self.on_release) as self.listener:
+            self.listener.join()
