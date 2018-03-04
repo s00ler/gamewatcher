@@ -1,6 +1,6 @@
 """Logging module."""
-from threading import Thread
 from copy import copy
+from threading import Thread
 
 from sqlalchemy import create_engine
 from sqlalchemy.sql.expression import func
@@ -27,17 +27,27 @@ class Logger:
             Session.configure(bind=engine)
             self.session = Session()
             self.to_load = []
-            self._batch_num = self.session.query(func.max(KeyboardLog.batch)) or 0
-            self._batch_time = batch_time or BATCH_TIME
+            self._batch_num = self.session.query(
+                func.max(KeyboardLog.batch)).scalar() or 0
+            self._batch_time = int(
+                batch_time) if batch_time is not None else BATCH_TIME
+            self._uploading = False
 
-    def _upload(self, to_load):
+
+    def _upload(self, *to_load):
+        self._uploading = True
+        self._batch_num += 1
         self.session.add_all(to_load)
         self.session.commit()
+        self._uploading = False
+        print('Batch uploaded.')
 
     def finalize(self):
-        self.session.add_all(self.to_load)
-        self.to_load = []
-        self.session.commit()
+        """Call after interrupt event."""
+        if not self._uploading:
+            self.session.add_all(self.to_load)
+            self.to_load = []
+            self.session.commit()
 
     def write(self, data):
         """Create database session and writes to database.
@@ -46,12 +56,12 @@ class Logger:
         """
         if not self.to_load:
             self.start_timestamp = data.timestamp
-        if data.timestamp - self.start_timestamp > self._batch_time:
-            self._batch_num += 1
+        if data.timestamp - self.start_timestamp > self._batch_time and not self._uploading:
             self.start_timestamp = data.timestamp
-            thread = Thread(target=self._upload, args=copy(self.to_load))
-            thread.start()
+            uploader = Thread(target=self._upload, args=copy(self.to_load))
+            uploader.start()
             self.to_load = []
+
         data.batch = self._batch_num
         data.action_type = Action.get()
         self.to_load.append(data)

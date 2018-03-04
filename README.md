@@ -8,7 +8,7 @@ Application contains keylogger part, which is used for collecting user mouse and
 # Installation
 
 1.  [Download](https://github.com/s00ler/gamewatcher/archive/master.zip) repository and unpack it or clone via git.
-2.  Install latest version of [python 3](https://www.python.org/ftp/python/3.6.4/python-3.6.4-macosx10.6.pkg).
+2.  Install latest version of [python 3](https://www.python.org).
 3.  In terminal go to unpacked directory:
 
     `cd /path/to/unpacked/directory/`
