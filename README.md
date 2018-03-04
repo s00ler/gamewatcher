@@ -35,4 +35,4 @@ Application contains keylogger part, which is used for collecting user mouse and
 -   \-h, --help  show this help message and exit
 -   \-cs CS      local or remote
 -   \-a A        Action
--   \-bt BT      Batch period\`
+-   \-bt BT      Batch period
