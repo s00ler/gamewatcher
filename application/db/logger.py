@@ -28,7 +28,7 @@ class Logger:
             self.session = Session()
             self.to_load = []
             self._batch_num = self.session.query(
-                func.max(KeyboardLog.batch)).scalar() or 0
+                func.max(KeyboardLog.batch)).scalar() + 1 or 0
             self._batch_time = int(
                 batch_time) if batch_time is not None else BATCH_TIME
             self._uploading = False

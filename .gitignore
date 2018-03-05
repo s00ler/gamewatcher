@@ -108,3 +108,4 @@ venv.bak/
 *.db
 *.ini
 *.pickle
+test.py

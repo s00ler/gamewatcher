@@ -1,8 +1,8 @@
 from sqlalchemy import Column, String, Integer, Numeric, BigInteger
-from .base import Base, mac, name
+from .base import Base, mac, name, ToDictMixin
 
 
-class KeyboardLog(Base):
+class KeyboardLog(Base, ToDictMixin):
     """Implement interface to database table that contains keyboard logs."""
 
     __tablename__ = 'gw_keyboard_logs'

@@ -1,8 +1,8 @@
 from sqlalchemy import Column, Float, String, Integer, BigInteger, Numeric
-from .base import Base, mac, name
+from .base import Base, mac, name, ToDictMixin
 
 
-class MouseLog(Base):
+class MouseLog(Base, ToDictMixin):
     """Implement interface to database table that contains ,ouse logs."""
 
     __tablename__ = 'gw_mouse_logs'

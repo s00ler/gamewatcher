@@ -2,6 +2,7 @@
 from datetime import datetime as dt
 from threading import Thread
 from pynput import keyboard as kb
+import json
 
 from ..action import Action
 from ..models import KeyboardLog
@@ -18,6 +19,8 @@ class Keyboard:
         self.logger = logger
         self.listener = None
         self.stopped = False
+        self.rus_eng = json.loads(open('./rus_eng.json', 'r').read())
+
 
     def on_press(self, key):
         job = Thread(target=self._on_press, args=([key]))
@@ -37,16 +40,24 @@ class Keyboard:
             Action.input()
         else:
             if not self.stopped:
+                key_symbol = str(key)
                 if isinstance(key, kb.KeyCode):
                     try:
                         key_code = str(ord(key.char.lower()))
+                        key_symbol = key_symbol[1:-1]
                     except Exception:
                         key_code = str(key)
                 else:
                     key_code = str(key.name)
+
+                if key_symbol in self.rus_eng:
+                    translate = self.rus_eng[key_symbol]
+                    key_symbol = translate['eng']
+                    key_code = int(translate['code'])
+
                 self.logger.write(KeyboardLog(
                     key_code=key_code,
-                    key_symbol=str(key),
+                    key_symbol=key_symbol,
                     timestamp=dt.utcnow().timestamp(),
                     key_action='press'
                 ))
@@ -55,16 +66,24 @@ class Keyboard:
         """Action on releasing key."""
         if key not in [kb.Key.f12, kb.Key.f10] and not self.stopped:
             if not self.stopped:
+                key_symbol = str(key)
                 if isinstance(key, kb.KeyCode):
                     try:
                         key_code = str(ord(key.char.lower()))
+                        key_symbol = key_symbol[1:-1]
                     except Exception:
                         key_code = str(key)
                 else:
                     key_code = str(key.name)
+
+                if key_symbol in self.rus_eng:
+                    translate = self.rus_eng[key_symbol]
+                    key_symbol = translate['eng']
+                    key_code = int(translate['code'])
+
                 self.logger.write(KeyboardLog(
                     key_code=key_code,
-                    key_symbol=str(key),
+                    key_symbol=key_symbol,
                     timestamp=dt.utcnow().timestamp(),
                     key_action='release'
                 ))
@@ -74,3 +93,17 @@ class Keyboard:
         with kb.Listener(on_press=self.on_press,
                          on_release=self.on_release) as self.listener:
             self.listener.join()
+
+
+import json
+a = json.loads(open('./rus_eng.json', 'r').read())
+a
+for rus, eng in a.items():
+    new_eng = {}
+    for s, c in eng.items():
+        new_eng['eng'] = s
+        new_eng['code'] = c
+
+    a[rus] = new_eng
+with open('./rus_eng.json', 'w') as f:
+    f.write(json.dumps(a))
