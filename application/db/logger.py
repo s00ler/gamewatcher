@@ -28,25 +28,30 @@ class Logger:
             Session.configure(bind=engine)
             self.session = Session()
             self.to_load = []
-            self._batch_num = self.session.query(
-                func.max(KeyboardLog.batch)).scalar() + 1 or 0
+
+            try:
+                self._batch_num = self.session.query(
+                    func.max(KeyboardLog.batch)).scalar() + 1
+            except Exception as e:
+                self._batch_num = 0
+
             self._batch_time = int(
                 batch_time) if batch_time is not None else BATCH_TIME
             self._uploading = False
 
-
     def _upload(self, *to_load):
-
         self._uploading = True
         to_predict = [copy(log) for log in to_load]
         self._batch_num += 1
         self.session.add_all(to_load)
         self.session.commit()
-        prediction(to_predict)
+        try:
+            prediction(to_predict)
+        except Exception:
+            pass
         self._uploading = False
 
         print('Batch uploaded.')
-
 
     def finalize(self):
         """Call after interrupt event."""

@@ -13,7 +13,7 @@ if __name__ == '__main__':
     settings = ConfigParser()
     settings.read('settings.ini')
     if args.cs:
-        print('Trying to connect to specified database...')
+        print('Trying to connect to {} database...'.format(args.cs))
         logger = Logger(db_path=settings['DATABASE'][args.cs], batch_time=args.bt)
         print('Connected to specified database.')
     else:
@@ -23,13 +23,7 @@ if __name__ == '__main__':
             print('Connected to remote database.')
         except Exception as remote:
             print('Remote connection failed due to {}.'.format(remote))
-            try:
-                print('Establishing local connection...')
-                logger = Logger(db_path=settings['DATABASE']['local'], batch_time=args.bt)
-                print('Connected to local database.')
-            except Exception as local:
-                print('Local connection failed due to {}.'.format(local))
-                sys.exit(0)
+            sys.exit(0)
 
     def signal_handler(signal, frame):
         print('\nInterrupt initialised.')
