@@ -1,5 +1,4 @@
 import sys
-import signal
 from threading import Thread
 from configparser import ConfigParser
 
@@ -12,6 +11,7 @@ if __name__ == '__main__':
     Action.set(args.a)
     settings = ConfigParser()
     settings.read('settings.ini')
+
     if args.cs:
         print('Trying to connect to {} database...'.format(args.cs))
         logger = Logger(db_path=settings['DATABASE'][args.cs], batch_time=args.bt)
@@ -23,23 +23,23 @@ if __name__ == '__main__':
             print('Connected to remote database.')
         except Exception as remote:
             print('Remote connection failed due to {}.'.format(remote))
-            sys.exit(0)
-
-    def signal_handler(signal, frame):
-        print('\nInterrupt initialised.')
-        logger.finalize()
-        logger.session.close()
-        print('Database session closed.')
-        print('Exit.')
-        sys.exit(0)
-
-    signal.signal(signal.SIGINT, signal_handler)
+            try:
+                print('Establishing Local connection...')
+                logger = Logger(db_path=settings['DATABASE']['local'], batch_time=args.bt)
+                print('Connected to Local database.')
+            except Exception as local:
+                print('Local connection failed due to {}.'.format(local))
+                sys.exit(0)
 
     mouse_listener = Mouse(logger)
     keyboard_listener = Keyboard(logger)
     threads = [Thread(target=keyboard_listener.listen, daemon=True),
                Thread(target=mouse_listener.listen, daemon=True)]
-    for thread in threads:
-        thread.start()
-    for thread in threads:
-        thread.join()
+    try:
+        for thread in threads:
+            thread.start()
+        for thread in threads:
+            thread.join()
+    except KeyboardInterrupt:
+        logger.finalize()
+        print('Exitting.')
