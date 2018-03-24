@@ -7,7 +7,7 @@ from ..models import KeyboardLog
 
 class Predictor:
 
-    with open('estimator.pickle', 'rb') as f:
+    with open('./application/datascience/estimator.pickle', 'rb') as f:
         estimator = pickle.load(f)
 
     def __init__(self, data):
@@ -32,11 +32,10 @@ class Predictor:
         self.features = self.mouse.merge(self.keyboard, left_index=True, right_index=True, how='outer').fillna(0)
 
     def _preprocess_keyboard(self):
-        all_kb = json.loads(open('all_keys_kb.json', 'r').read())
+        all_kb = json.loads(open('./application/datascience/all_keys_kb.json', 'r').read())
 
         def preprocess_keyboard(keyboard):
             keyboard['skip'] = False
-            keyboard.head()
             keyboard = keyboard.sort_values(by='timestamp')
             processed_keyboard = []
             for i, (action_type, key_action, key, time, skip) in enumerate(zip(
@@ -47,13 +46,13 @@ class Predictor:
                     keyboard.skip)):
                 if key_action == 'press' and not skip:
                     for r_i, (r_action_type, r_key_action, r_key, r_time, r_skip) in enumerate(zip(
-                            keyboard.action_type[i+1:],
-                            keyboard.key_action[i+1:],
-                            keyboard.key[i+1:],
-                            keyboard.timestamp[i+1:],
-                            keyboard.skip[i+1:])):
+                            keyboard.action_type[i + 1:],
+                            keyboard.key_action[i + 1:],
+                            keyboard.key[i + 1:],
+                            keyboard.timestamp[i + 1:],
+                            keyboard.skip[i + 1:])):
                         if r_key == key and r_key_action == key_action:
-                            keyboard.iloc[i+r_i+1, -1] = True
+                            keyboard.iloc[i + r_i + 1, -1] = True
                         if r_i - i > 100:
                             break
                         elif r_key == key and r_key_action != key_action:
@@ -79,7 +78,7 @@ class Predictor:
         self.keyboard = kb_features.set_index(['id', 'key']).unstack('key').fillna(0)
 
     def _preprocess_mouse(self):
-        all_ms = json.loads(open('all_keys_ms.json', 'r').read())
+        all_ms = json.loads(open('./application/datascience/all_keys_ms.json', 'r').read())
 
         def preprocess_mouse(mouse):
             processed_mouse = []

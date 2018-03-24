@@ -7,6 +7,7 @@ Base = declarative_base()
 mac = get_mac()
 name = platform.node()
 
+
 class ToDictMixin:
 
     def to_dict(self):

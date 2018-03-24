@@ -7,7 +7,7 @@ from sqlalchemy.orm import sessionmaker
 
 from ..models import Base, KeyboardLog
 from ..action import Action
-
+from ..datascience import prediction
 BATCH_TIME = 120
 
 
@@ -38,7 +38,8 @@ class Logger:
 
     def _upload(self, *to_load):
         self._uploading = True
-        # to_predict = [copy(log) for log in to_load]
+        to_predict = [copy(log) for log in to_load]
+        print(prediction(to_predict))
         self._batch_num += 1
         session = self._Session()
         session.add_all(to_load)
