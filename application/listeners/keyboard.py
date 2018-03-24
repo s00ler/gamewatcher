@@ -21,16 +21,15 @@ class Keyboard:
         self.stopped = False
         self.rus_eng = json.loads(open('./rus_eng.json', 'r').read())
 
+    def thread_on_press(self, key):
+        job = Thread(target=self.on_press, args=([key]))
+        job.start()
+
+    def thread_on_release(self, key):
+        job = Thread(target=self.on_release, args=([key]))
+        job.start()
 
     def on_press(self, key):
-        job = Thread(target=self._on_press, args=([key]))
-        job.start()
-
-    def on_release(self, key):
-        job = Thread(target=self._on_release, args=([key]))
-        job.start()
-
-    def _on_press(self, key):
         """Action on pressing key."""
         if key == kb.Key.f12 and not self.stopped:  # f12 handling
             self.stopped = True
@@ -62,7 +61,7 @@ class Keyboard:
                     key_action='press'
                 ))
 
-    def _on_release(self, key):
+    def on_release(self, key):
         """Action on releasing key."""
         if key not in [kb.Key.f12, kb.Key.f10] and not self.stopped:
             if not self.stopped:
@@ -90,20 +89,6 @@ class Keyboard:
 
     def listen(self):
         """Start listening."""
-        with kb.Listener(on_press=self.on_press,
-                         on_release=self.on_release) as self.listener:
+        with kb.Listener(on_press=self.thread_on_press,
+                         on_release=self.thread_on_release) as self.listener:
             self.listener.join()
-
-
-import json
-a = json.loads(open('./rus_eng.json', 'r').read())
-a
-for rus, eng in a.items():
-    new_eng = {}
-    for s, c in eng.items():
-        new_eng['eng'] = s
-        new_eng['code'] = c
-
-    a[rus] = new_eng
-with open('./rus_eng.json', 'w') as f:
-    f.write(json.dumps(a))

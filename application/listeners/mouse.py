@@ -5,16 +5,6 @@ from pynput import mouse
 
 from ..models import MouseLog
 
-# import sys # TODO for mouse reminder
-# if sys.platform == 'darwin':
-#     import AppKit
-#     screen_size = [(screen.frame().size.width, screen.frame().size.height)
-#                    for screen in AppKit.NSScreen.screens()]
-# else:
-#     add screeninfo to requirements.txt
-#     from screeninfo import get_monitors
-#     screen_size = [monitor_size for monitor_size in get_monitors()]
-
 
 class Scroll:
     """Class to handle scroll."""
@@ -53,18 +43,18 @@ class Mouse:
         self.listener = None
         self.scroll = Scroll()
 
-    def _on_move(self, x, y):
+    def on_move(self, x, y):
         """Action on moving mouse to point."""
         self.scroll.release()
 
-    def _on_click(self, x, y, button, pressed):
+    def on_click(self, x, y, button, pressed):
         """Action on clicking mouse at the point."""
         self.scroll.release()
         click_type = str(button).split('.')[-1]
         self.logger.write(MouseLog(x=x, y=y, key=click_type,
                                    timestamp=dt.utcnow().timestamp()))
 
-    def _on_scroll(self, x, y, dx, dy):
+    def on_scroll(self, x, y, dx, dy):
         """Action on scrolling mouse at the point."""
         if self.scroll.set(x, y):
             self.logger.write(MouseLog(x=x, y=y, key='scroll',
@@ -72,7 +62,7 @@ class Mouse:
 
     def listen(self):
         """Start listening."""
-        with mouse.Listener(on_move=self._on_move,
-                            on_click=self._on_click,
-                            on_scroll=self._on_scroll) as self.listener:
+        with mouse.Listener(on_move=self.on_move,
+                            on_click=self.on_click,
+                            on_scroll=self.on_scroll) as self.listener:
             self.listener.join()

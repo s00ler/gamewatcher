@@ -1,14 +1,12 @@
 """Logging module."""
 from copy import copy
 from threading import Thread
-
 from sqlalchemy import create_engine
 from sqlalchemy.sql.expression import func
 from sqlalchemy.orm import sessionmaker
 
 from ..models import Base, KeyboardLog
 from ..action import Action
-from ..datascience import prediction
 
 BATCH_TIME = 120
 
@@ -26,34 +24,38 @@ class Logger:
             Base.metadata.create_all(engine)
             Session = sessionmaker(bind=engine)
             Session.configure(bind=engine)
-            self.session = Session()
+            self._Session = Session
             self.to_load = []
-            self._batch_num = self.session.query(
-                func.max(KeyboardLog.batch)).scalar() + 1 or 0
-            self._batch_time = int(
-                batch_time) if batch_time is not None else BATCH_TIME
+
+            try:
+                self._batch_num = self.session.query(
+                    func.max(KeyboardLog.batch)).scalar() + 1
+            except Exception as e:
+                self._batch_num = 0
+
+            self._batch_time = int(batch_time) if batch_time else BATCH_TIME
             self._uploading = False
 
-
     def _upload(self, *to_load):
-
         self._uploading = True
-        to_predict = [copy(log) for log in to_load]
+        # to_predict = [copy(log) for log in to_load]
         self._batch_num += 1
-        self.session.add_all(to_load)
-        self.session.commit()
-        prediction(to_predict)
+        session = self._Session()
+        session.add_all(to_load)
+        session.commit()
+        session.close()
         self._uploading = False
 
         print('Batch uploaded.')
 
-
     def finalize(self):
         """Call after interrupt event."""
         if not self._uploading:
-            self.session.add_all(self.to_load)
-            self.to_load = []
-            self.session.commit()
+
+            session = self._Session()
+            session.add_all(self.to_load)
+            session.commit()
+            session.close()
 
     def write(self, data):
         """Create database session and writes to database.
@@ -67,7 +69,6 @@ class Logger:
             uploader = Thread(target=self._upload, args=copy(self.to_load))
             uploader.start()
             self.to_load = []
-
         data.batch = self._batch_num
         data.action_type = Action.get()
         self.to_load.append(data)
