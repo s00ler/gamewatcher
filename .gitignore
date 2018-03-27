@@ -107,5 +107,4 @@ venv.bak/
 # custom
 *.db
 *.ini
-*.pickle
 test.py
