@@ -2,6 +2,8 @@ import pickle
 import json
 import pandas as pd
 
+from multiprocessing import Process
+from threading import Thread
 from ..models import KeyboardLog
 
 
@@ -101,6 +103,14 @@ class Predictor:
         self.mouse = ms_features.set_index(['id', 'key']).unstack('key').fillna(0)
 
 
+def game_alert():
+    import subprocess
+    subprocess.Popen('python3 application/datascience/inteface.py', shell=True)
+
+
 def prediction(data):
     predictor = Predictor(data)
-    print('Predicted action type: ', predictor.predict())
+    prediction = predictor.predict()
+    print('Predicted action type: ', prediction)
+    if prediction[0] == 'game':
+        game_alert()
