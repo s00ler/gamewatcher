@@ -106,5 +106,4 @@ venv.bak/
 
 # custom
 *.db
-*.ini
 test.py

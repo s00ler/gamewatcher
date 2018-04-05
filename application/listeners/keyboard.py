@@ -19,7 +19,7 @@ class Keyboard:
         self.logger = logger
         self.listener = None
         self.stopped = False
-        self.rus_eng = json.loads(open('./application/listeners/rus_eng.json', 'r').read())
+        self.rus_eng = json.loads(open('./stuff/rus_eng.json', 'r').read())
 
     def thread_on_press(self, key):
         job = Thread(target=self.on_press, args=([key]))

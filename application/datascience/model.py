@@ -2,14 +2,14 @@ import pickle
 import json
 import pandas as pd
 
-from multiprocessing import Process
 from threading import Thread
 from ..models import KeyboardLog
+from sklearn.ensemble import RandomForestClassifier  # need to build exe
 
 
 class Predictor:
 
-    with open('./application/datascience/estimator.pickle', 'rb') as f:
+    with open('./stuff/estimator.pickle', 'rb') as f:
         estimator = pickle.load(f)
 
     def __init__(self, data):
@@ -34,7 +34,7 @@ class Predictor:
         self.features = self.mouse.merge(self.keyboard, left_index=True, right_index=True, how='outer').fillna(0)
 
     def _preprocess_keyboard(self):
-        all_kb = json.loads(open('./application/datascience/all_keys_kb.json', 'r').read())
+        all_kb = json.loads(open('./stuff/all_keys_kb.json', 'r').read())
 
         def preprocess_keyboard(keyboard):
             keyboard['skip'] = False
@@ -80,7 +80,7 @@ class Predictor:
         self.keyboard = kb_features.set_index(['id', 'key']).unstack('key').fillna(0)
 
     def _preprocess_mouse(self):
-        all_ms = json.loads(open('./application/datascience/all_keys_ms.json', 'r').read())
+        all_ms = json.loads(open('./stuff/all_keys_ms.json', 'r').read())
 
         def preprocess_mouse(mouse):
             processed_mouse = []
@@ -104,19 +104,8 @@ class Predictor:
 
 
 def game_alert():
-    # import subprocess
-    # subprocess.Popen('python3 application/datascience/inteface.py', shell=True)
-    import tkinter as tk
-    win = tk.Tk()
-    win.title('Hello, Tkinter!')
-    win.geometry('1000x800')  # Size 200, 200
-    win.configure(background='red')
-    label = tk.Label(win, text='ALERT!!', relief=tk.RAISED, justify=tk.CENTER, bg='white', font=("Courier", 160))
-    label.pack()
-    win.bell()
-    win.focus_set()
-    win.attributes("-topmost", True)
-    tk.mainloop()
+    import subprocess
+    subprocess.Popen('./inteface', shell=True)
 
 
 def prediction(data):
@@ -124,5 +113,5 @@ def prediction(data):
     prediction = predictor.predict()
     print('Predicted action type: ', prediction)
     if prediction[0] == 'game':
-        p = Process(target=game_alert)
-        p.start()
+        t = Thread(target=game_alert)
+        t.start()
