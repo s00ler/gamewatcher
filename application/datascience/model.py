@@ -104,8 +104,19 @@ class Predictor:
 
 
 def game_alert():
-    import subprocess
-    subprocess.Popen('python3 application/datascience/inteface.py', shell=True)
+    # import subprocess
+    # subprocess.Popen('python3 application/datascience/inteface.py', shell=True)
+    import tkinter as tk
+    win = tk.Tk()
+    win.title('Hello, Tkinter!')
+    win.geometry('1000x800')  # Size 200, 200
+    win.configure(background='red')
+    label = tk.Label(win, text='ALERT!!', relief=tk.RAISED, justify=tk.CENTER, bg='white', font=("Courier", 160))
+    label.pack()
+    win.bell()
+    win.focus_set()
+    win.attributes("-topmost", True)
+    tk.mainloop()
 
 
 def prediction(data):
@@ -113,4 +124,5 @@ def prediction(data):
     prediction = predictor.predict()
     print('Predicted action type: ', prediction)
     if prediction[0] == 'game':
-        game_alert()
+        p = Process(target=game_alert)
+        p.start()
